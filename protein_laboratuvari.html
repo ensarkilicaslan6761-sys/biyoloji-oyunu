@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Protein Testi – Final</title>
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    color:white;
+    overflow:hidden;
+    transition:0.3s;
+}
+
+#app{
+    background:#1c2833;
+    width:600px;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.6);
+    text-align:center;
+    position:relative;
+    z-index:2;
+}
+
+button{
+    padding:12px 18px;
+    margin:6px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#00c6ff;
+    color:white;
+    font-weight:bold;
+    transition:0.2s;
+}
+
+button:hover{
+    background:#0072ff;
+    transform:scale(1.05);
+}
+
+.konfeti{
+    position:absolute;
+    width:10px;
+    height:10px;
+    top:-10px;
+    animation:dus 2s linear forwards;
+}
+
+@keyframes dus{
+    to{
+        transform:translateY(100vh) rotate(720deg);
+        opacity:0;
+    }
+}
+
+#sonuc{
+    position:absolute;
+    font-size:70px;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    display:none;
+    z-index:3;
+    font-weight:bold;
+}
+
+audio{
+    display:none;
+}
+</style>
+</head>
+<body>
+
+<audio id="dogruSes" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+<audio id="yanlisSes" src="https://www.soundjay.com/button/beep-10.wav"></audio>
+
+<div id="sonuc"></div>
+
+<div id="app">
+<h2>🧬 Protein Testi</h2>
+<p id="soru">Başlamak için Başlat butonuna bas</p>
+<div id="cevaplar"></div>
+<button id="baslatBtn" onclick="baslat()">🚀 Teste Başla</button>
+<p id="durum">Soru: 0 / 10 | Doğru: 0 | Yanlış: 0</p>
+</div>
+
+<script>
+let sorular=[
+{ soru:"Peptit bağı hangi iki grup arasında kurulur?", secenekler:["Karboksil - Amino","Amino - Fosfat","Hidroksil - Metil","Fosfat - Şeker"], dogru:0 },
+{ soru:"Bir proteinin 3 boyutlu yapısı hangi düzeydedir?", secenekler:["Primer","Sekonder","Tersiyer","Kuaterner"], dogru:2 },
+{ soru:"Denatürasyonda hangisi bozulmaz?", secenekler:["Primer yapı","Hidrojen bağları","Üç boyutlu yapı","Enzim aktivitesi"], dogru:0 },
+{ soru:"Enzimlerin özgüllüğü hangi yapıya bağlıdır?", secenekler:["Aktif bölge","Mitokondri","Lizozom","Golgi aygıtı"], dogru:0 },
+{ soru:"20 amino asidin farklı olmasını sağlayan kısım nedir?", secenekler:["R grubu","Amino grubu","Karboksil grubu","Peptit bağı"], dogru:0 },
+{ soru:"Protein sentezi hangi organelde gerçekleşir?", secenekler:["Ribozom","Mitokondri","Çekirdek","Lizozom"], dogru:0 },
+{ soru:"Kas kasılmasında görevli proteinlerden biri?", secenekler:["Miyozin","Amilaz","İnsülin","Keratin"], dogru:0 },
+{ soru:"Enzimler hangi molekül grubuna girer?", secenekler:["Protein","Karbonhidrat","Yağ","Nükleik asit"], dogru:0 },
+{ soru:"Proteinler hangi elementleri temel olarak içerir?", secenekler:["C,H,O,N","C,H,O","C,O,H","H,C,O,N,S"], dogru:0 },
+{ soru:"Primer yapı neyi ifade eder?", secenekler:["Amino asit dizilimi","Yan zincir bağları","3D katlanma","Alt birim birleşimi"], dogru:0 }
+];
+
+let sirano=0;
+let dogruSay=0;
+let yanlisSay=0;
+
+function baslat(){
+sirano=0; dogruSay=0; yanlisSay=0;
+document.getElementById("baslatBtn").style.display="none";
+document.body.style.background="linear-gradient(135deg,#0f2027,#203a43,#2c5364)";
+soruGoster();
+}
+
+function soruGoster(){
+if(sirano>=10){sonucGoster(); return;}
+let s=sorular[sirano];
+document.getElementById("soru").innerText=s.soru;
+let alan=document.getElementById("cevaplar"); alan.innerHTML="";
+s.secenekler.forEach((sec,index)=>{
+let btn=document.createElement("button");
+btn.innerText=sec;
+btn.onclick=function(){kontrol(index,s.dogru);};
+alan.appendChild(btn);
+});
+document.getElementById("durum").innerText=
+"Soru: "+(sirano+1)+" / 10 | Doğru: "+dogruSay+" | Yanlış: "+yanlisSay;
+}
+
+function kontrol(secim,dogru){
+if(secim===dogru){dogruSay++; dogruEfekti();} 
+else {yanlisSay++; yanlisEfekti();}
+sirano++;
+setTimeout(soruGoster,1000);
+}
+
+function dogruEfekti(){
+document.getElementById("sonuc").innerText="✅ DOĞRU!";
+document.getElementById("sonuc").style.color="lime";
+document.getElementById("sonuc").style.display="block";
+document.getElementById("dogruSes").play();
+konfetiPatlat();
+document.body.style.background="green";
+setTimeout(()=>{document.getElementById("sonuc").style.display="none"; document.body.style.background="linear-gradient(135deg,#0f2027,#203a43,#2c5364)";},900);
+}
+
+function yanlisEfekti(){
+document.getElementById("sonuc").innerText="❌ YANLIŞ!";
+document.getElementById("sonuc").style.color="red";
+document.getElementById("sonuc").style.display="block";
+document.getElementById("yanlisSes").play();
+document.body.style.background="red";
+setTimeout(()=>{document.getElementById("sonuc").style.display="none"; document.body.style.background="linear-gradient(135deg,#0f2027,#203a43,#2c5364)";},900);
+}
+
+function konfetiPatlat(){
+for(let i=0;i<50;i++){
+let div=document.createElement("div");
+div.classList.add("konfeti");
+div.style.left=Math.random()*100+"vw";
+div.style.background="hsl("+Math.random()*360+",100%,50%)";
+document.body.appendChild(div);
+setTimeout(()=>div.remove(),2000);
+}
+}
+
+function sonucGoster(){
+let yuzde=Math.round((dogruSay/10)*100);
+let yorum="";
+let renkli=false;
+if(yuzde>=90) yorum="🏆 Protein Uzmanısın!";
+else if(yuzde>=70) yorum="👏 Gayet İyi!";
+else if(yuzde>=60){ yorum="🎉 Tebrikler! Oyunu geçtiniz!"; renkli=true;}
+else if(yuzde>=50) yorum="🙂 Fena değil ama tekrar etmelisin.";
+else yorum="📚 Konuyu tekrar çalışmalısın.";
+
+document.getElementById("soru").innerText="🎓 Test Tamamlandı!";
+document.getElementById("cevaplar").innerHTML=
+"<h3>📊 Analiz Raporu</h3>"+
+"Doğru: "+dogruSay+"<br>"+
+"Yanlış: "+yanlisSay+"<br>"+
+"Başarı: "+yuzde+"%<br><br>"+
+yorum;
+
+if(renkli){
+let renkler=["#ff4d4d","#4dff4d","#4d4dff","#ffff4d","#ff4dff","#4dffff"];
+let i=0;
+let renkAnim=setInterval(()=>{
+document.body.style.background=renkler[i%renkler.length];
+i++;
+},200);
+setTimeout(()=>{clearInterval(renkAnim); document.body.style.background="linear-gradient(135deg,#0f2027,#203a43,#2c5364)";},5000);
+}
+
+let btn=document.getElementById("baslatBtn");
+btn.innerText="🔄 Tekrar Başlat";
+btn.style.display="inline-block";
+}
+</script>
+
+</body>
+</html>
